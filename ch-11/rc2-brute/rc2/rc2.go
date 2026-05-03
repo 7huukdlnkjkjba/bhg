@@ -1,13 +1,13 @@
 // Copyright 2015 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
+// 此源代码受BSD-style许可证约束
 // license that can be found in the LICENSE file.
 
-// Package rc2 implements the RC2 cipher
+// Package rc2实现了RC2加密算法
 /*
 https://www.ietf.org/rfc/rfc2268.txt
 http://people.csail.mit.edu/rivest/pubs/KRRR98.pdf
 
-This code is licensed under the MIT license.
+此代码根据MIT许可证获得许可。
 */
 package rc2
 
@@ -16,16 +16,16 @@ import (
 	"encoding/binary"
 )
 
-// The rc2 block size in bytes
+// rc2块大小(以字节为单位)
 const BlockSize = 8
 
 type rc2Cipher struct {
 	k [64]uint16
 }
 
-// New returns a new rc2 cipher with the given key and effective key length t1
+// New使用给定的密钥和有效密钥长度t1返回一个新的rc2密码
 func New(key []byte, t1 int) (cipher.Block, error) {
-	// TODO(dgryski): error checking for key length
+	// TODO(dgryski): 密钥长度错误检查
 	return &rc2Cipher{
 		k: expandKey(key, t1),
 	}, nil
@@ -94,7 +94,7 @@ func (c *rc2Cipher) Encrypt(dst, src []byte) {
 	var j int
 
 	for j <= 16 {
-		// mix r0
+		// 混合r0
 		r0 = r0 + c.k[j] + (r3 & r2) + ((^r3) & r1)
 		r0 = rotl16(r0, 1)
 		j++
@@ -109,7 +109,7 @@ func (c *rc2Cipher) Encrypt(dst, src []byte) {
 		r2 = rotl16(r2, 3)
 		j++
 
-		// mix r3
+		// 混合r3
 		r3 = r3 + c.k[j] + (r2 & r1) + ((^r2) & r0)
 		r3 = rotl16(r3, 5)
 		j++
@@ -189,22 +189,22 @@ func (c *rc2Cipher) Decrypt(dst, src []byte) {
 	j := 63
 
 	for j >= 44 {
-		// unmix r3
+		// 反转r3
 		r3 = rotl16(r3, 16-5)
 		r3 = r3 - c.k[j] - (r2 & r1) - ((^r2) & r0)
 		j--
 
-		// unmix r2
+		// 反转r2
 		r2 = rotl16(r2, 16-3)
 		r2 = r2 - c.k[j] - (r1 & r0) - ((^r1) & r3)
 		j--
 
-		// unmix r1
+		// 反转r1
 		r1 = rotl16(r1, 16-2)
 		r1 = r1 - c.k[j] - (r0 & r3) - ((^r0) & r2)
 		j--
 
-		// unmix r0
+		// 反转r0
 		r0 = rotl16(r0, 16-1)
 		r0 = r0 - c.k[j] - (r3 & r2) - ((^r3) & r1)
 		j--
@@ -216,22 +216,22 @@ func (c *rc2Cipher) Decrypt(dst, src []byte) {
 	r0 = r0 - c.k[r3&63]
 
 	for j >= 20 {
-		// unmix r3
+		// 逆混合r3
 		r3 = rotl16(r3, 16-5)
 		r3 = r3 - c.k[j] - (r2 & r1) - ((^r2) & r0)
 		j--
 
-		// unmix r2
+		// 逆混合r2
 		r2 = rotl16(r2, 16-3)
 		r2 = r2 - c.k[j] - (r1 & r0) - ((^r1) & r3)
 		j--
 
-		// unmix r1
+		// 逆混合r1
 		r1 = rotl16(r1, 16-2)
 		r1 = r1 - c.k[j] - (r0 & r3) - ((^r0) & r2)
 		j--
 
-		// unmix r0
+		// 逆混合r0
 		r0 = rotl16(r0, 16-1)
 		r0 = r0 - c.k[j] - (r3 & r2) - ((^r3) & r1)
 		j--
@@ -245,22 +245,22 @@ func (c *rc2Cipher) Decrypt(dst, src []byte) {
 
 	for j >= 0 {
 
-		// unmix r3
+		// 逆混合r3
 		r3 = rotl16(r3, 16-5)
 		r3 = r3 - c.k[j] - (r2 & r1) - ((^r2) & r0)
 		j--
 
-		// unmix r2
+		// 逆混合r2
 		r2 = rotl16(r2, 16-3)
 		r2 = r2 - c.k[j] - (r1 & r0) - ((^r1) & r3)
 		j--
 
-		// unmix r1
+		// 逆混合r1
 		r1 = rotl16(r1, 16-2)
 		r1 = r1 - c.k[j] - (r0 & r3) - ((^r0) & r2)
 		j--
 
-		// unmix r0
+		// 逆混合r0
 		r0 = rotl16(r0, 16-1)
 		r0 = r0 - c.k[j] - (r3 & r2) - ((^r3) & r1)
 		j--

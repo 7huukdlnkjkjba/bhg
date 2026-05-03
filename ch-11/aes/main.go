@@ -12,7 +12,7 @@ import (
 )
 
 func pad(buf []byte) []byte {
-	// Assumes valid lengths. Should add additional checks.
+	// 假设长度有效。应该添加额外的检查。
 	length := len(buf)
 	padding := aes.BlockSize - (length % aes.BlockSize)
 	if padding == 0 {
@@ -25,7 +25,7 @@ func pad(buf []byte) []byte {
 }
 
 func unpad(buf []byte) []byte {
-	// Assume valid length and padding. Should add checks
+	// 假设长度和填充有效。应该添加检查
 	padding := int(buf[len(buf)-1])
 	return buf[:len(buf)-padding]
 }

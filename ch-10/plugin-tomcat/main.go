@@ -11,10 +11,10 @@ import (
 var Users = []string{"admin", "manager", "tomcat"}
 var Passwords = []string{"admin", "manager", "tomcat", "password"}
 
-// TomcatChecker implements the scanner.Check interface. Used for guessing Tomcat creds
+// TomcatChecker实现scanner.Check接口。用于猜测Tomcat凭据
 type TomcatChecker struct{}
 
-// Check attempts to identify guessable Tomcat credentials
+// Check尝试识别可猜测的Tomcat凭据
 func (c *TomcatChecker) Check(host string, port uint64) *scanner.Result {
 	var (
 		resp   *http.Response
@@ -32,13 +32,13 @@ func (c *TomcatChecker) Check(host string, port uint64) *scanner.Result {
 		return res
 	}
 	log.Println("Host responded to /manager/html request")
-	// Got a response back, check if authentication required
+	// 收到响应,检查是否需要认证
 	if resp.StatusCode != http.StatusUnauthorized || resp.Header.Get("WWW-Authenticate") == "" {
 		log.Println("Target doesn't appear to require Basic auth.")
 		return res
 	}
 
-	// Appears authentication is required. Assuming Tomcat manager. Guess passwords...
+	// 看起来需要认证。假设是Tomcat manager。猜测密码...
 	log.Println("Host requires authentication. Proceeding with password guessing...")
 	client = new(http.Client)
 	if req, err = http.NewRequest("GET", url, nil); err != nil {
@@ -62,7 +62,7 @@ func (c *TomcatChecker) Check(host string, port uint64) *scanner.Result {
 	return res
 }
 
-// New is the entry point required by the scanner
+// New是scanner要求的入口点
 func New() scanner.Checker {
 	return new(TomcatChecker)
 }

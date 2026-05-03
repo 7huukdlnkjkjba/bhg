@@ -1,4 +1,4 @@
-// Process Injection - DLL Filepath
+// 进程注入 - DLL文件路径
 
 package main
 

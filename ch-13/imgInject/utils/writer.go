@@ -11,7 +11,7 @@ import (
 	"github.com/blackhat-go/bhg/ch-13/imgInject/models"
 )
 
-//WriteData writes new data to offset
+// WriteData向偏移量写入新数据
 func WriteData(r *bytes.Reader, c *models.CmdLineOpts, b []byte) {
 	offset, err := strconv.ParseInt(c.Offset, 10, 64)
 	if err != nil {
@@ -29,7 +29,7 @@ func WriteData(r *bytes.Reader, c *models.CmdLineOpts, b []byte) {
 	w.Write(buff)
 	w.Write(b)
 	if c.Decode {
-		r.Seek(int64(len(b)), 1) // right bitshift to overwrite encode chunk
+		r.Seek(int64(len(b)), 1) // 右移位以覆盖编码块
 	}
 	_, err = io.Copy(w, r)
 	if err == nil {

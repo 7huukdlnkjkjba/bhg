@@ -27,7 +27,7 @@ type TOKEN struct {
 	tokenHandle syscall.Token
 }
 
-// User represent the information about a Windows account.
+// User代表Windows账户的信息。
 type User struct {
 	SID     string
 	Account string

@@ -18,7 +18,7 @@ const (
 func register(l *lua.LState) {
 	mt := l.NewTypeMetatable(LuaHttpTypeName)
 	l.SetGlobal("http", mt)
-	// static attributes
+	// 静态属性
 	l.SetField(mt, "head", l.NewFunction(head))
 	l.SetField(mt, "get", l.NewFunction(get))
 }
@@ -75,7 +75,7 @@ func get(l *lua.LState) int {
 		return 3
 	}
 	if username != "" || password != "" {
-		// Assume Basic Auth is required since user and/or password is set
+		// 由于设置了用户和/或密码,假设需要基本认证
 		req.SetBasicAuth(username, password)
 	}
 	if resp, err = client.Do(req); err != nil {

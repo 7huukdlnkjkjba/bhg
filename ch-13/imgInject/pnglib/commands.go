@@ -37,7 +37,7 @@ type MetaChunk struct {
 	Offset int64
 }
 
-//ProcessImage is the wrapper to parse PNG bytes
+//ProcessImage是解析PNG字节的包装器
 func (mc *MetaChunk) ProcessImage(b *bytes.Reader, c *models.CmdLineOpts) {
 	mc.validate(b)
 	if (c.Offset != "") && (c.Encode == false && c.Decode == false) {

@@ -10,7 +10,7 @@ const (
 	SecurityImpersonation  = 2
 	SecurityDelegation     = 3
 
-	// Integrity Levels
+	// 完整性级别
 	SECURITY_MANDATORY_UNTRUSTED_RID         = 0x00000000
 	SECURITY_MANDATORY_LOW_RID               = 0x00001000
 	SECURITY_MANDATORY_MEDIUM_RID            = 0x00002000

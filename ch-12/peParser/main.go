@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	f, err := os.Open("Telegram.exe") // Modify for binary or change to accept args
+	f, err := os.Open("Telegram.exe") // 修改为二进制文件或改为接受参数
 	check(err)
 	pefile, err := pe.NewFile(f)
 	check(err)
@@ -20,48 +20,48 @@ func main() {
 	dosHeader := make([]byte, 96)
 	sizeOffset := make([]byte, 4)
 
-	// Dec to Ascii (searching for MZ)
+	// 十进制到ASCII(搜索MZ)
 	_, err = f.Read(dosHeader)
 	check(err)
 	fmt.Println("[-----DOS Header / Stub-----]")
 	fmt.Printf("[+] Magic Value: %s%s\n", string(dosHeader[0]), string(dosHeader[1]))
 
-	// Validate PE+0+0 (Valid PE format)
+	// 验证PE+0+0(有效的PE格式)
 	pe_sig_offset := int64(binary.LittleEndian.Uint32(dosHeader[0x3c:]))
 	f.ReadAt(sizeOffset[:], pe_sig_offset)
 	fmt.Println("[-----Signature Header-----]")
 	fmt.Printf("[+] LFANEW Value: %s\n", string(sizeOffset))
 
-	// Create the reader and read COFF Header
+	// 创建reader并读取COFF Header
 	sr := io.NewSectionReader(f, 0, 1<<63-1)
 	_, err = sr.Seek(pe_sig_offset+4, os.SEEK_SET)
 	check(err)
 	binary.Read(sr, binary.LittleEndian, &pefile.FileHeader)
 
-	// Get size of OptionalHeader
+	// 获取OptionalHeader的大小
 	var sizeofOptionalHeader32 = uint16(binary.Size(pe.OptionalHeader32{}))
 	var sizeofOptionalHeader64 = uint16(binary.Size(pe.OptionalHeader64{}))
 	var oh32 pe.OptionalHeader32
 	var oh64 pe.OptionalHeader64
 
-	// Read OptionalHeader
+	// 读取OptionalHeader
 	switch pefile.FileHeader.SizeOfOptionalHeader {
 	case sizeofOptionalHeader32:
 		binary.Read(sr, binary.LittleEndian, &oh32)
 	case sizeofOptionalHeader64:
 		binary.Read(sr, binary.LittleEndian, &oh64)
 	}
-	// Print File Header
+	// 打印File Header
 	fmt.Println("[-----COFF File Header-----]")
 	fmt.Printf("[+] Machine Architecture: %#x\n", pefile.FileHeader.Machine)
 	fmt.Printf("[+] Number of Sections: %#x\n", pefile.FileHeader.NumberOfSections)
 	fmt.Printf("[+] Size of Optional Header: %#x\n", pefile.FileHeader.SizeOfOptionalHeader)
-	// Print section names
+	// 打印节名称
 	fmt.Println("[-----Section Offsets-----]")
 	fmt.Printf("[+] Number of Sections Field Offset: %#x\n", pe_sig_offset+6)
-	// this is the end of the Signature header (0x7c) + coff (20bytes) + oh32 (224bytes)
+	// 这是Signature header (0x7c) + coff (20bytes) + oh32 (224bytes)的结束位置
 	fmt.Printf("[+] Section Table Offset: %#x\n", pe_sig_offset+0xF8)
-	// Print Optional Header
+	// 打印Optional Header
 	fmt.Println("[-----Optional Header-----]")
 	fmt.Printf("[+] Entry Point: %#x\n", oh32.AddressOfEntryPoint)
 	fmt.Printf("[+] ImageBase: %#x\n", oh32.ImageBase)
@@ -74,7 +74,7 @@ func main() {
 	fmt.Printf("[+] Machine: %#x\n", pefile.FileHeader.Machine)
 	fmt.Printf("[+] Subsystem: %#x\n", oh32.Subsystem)
 	fmt.Printf("[+] DLLCharacteristics: %#x\n", oh32.DllCharacteristics)
-	// Print Data Directory
+	// 打印Data Directory
 	fmt.Println("[-----Data Directory-----]")
 	var winnt_datadirs = []string{
 		"IMAGE_DIRECTORY_ENTRY_EXPORT",
@@ -92,7 +92,7 @@ func main() {
 		"IMAGE_DIRECTORY_ENTRY_IAT",
 		"IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT",
 		"IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR",
-		"IMAGE_NUMBEROF_DIRECTORY_ENTRIES",
+		"IMAGE_DIRECTORY_ENTRY_NUMBEROF_DIRECTORY_ENTRIES",
 	}
 	for idx, directory := range oh32.DataDirectory {
 		fmt.Printf("[!] Data Directory: %s\n", winnt_datadirs[idx])
@@ -124,9 +124,9 @@ func check(e error) {
 	}
 }
 
-// Things to consider when modifying an image
-// 1. Round off the last section
-// 2. Add the stub in the PE Header
-// 3. Increase the number of sections
-// 4. Change the IMAGE_SIZE
-// 5. Add bytes to memory code-cave
+// 修改镜像时需要考虑的事项
+// 1. 舍入最后一个节
+// 2. 在PE Header中添加stub
+// 3. 增加节的数量
+// 4. 更改IMAGE_SIZE
+// 5. 在内存代码空洞中添加字节

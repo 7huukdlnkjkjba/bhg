@@ -29,7 +29,7 @@ func SetTokenPrivilege(i *Inject) error {
 		return err
 	}
 
-	// Start LookupPrivilegeValue
+	// 开始LookupPrivilegeValue
 	// https://docs.microsoft.com/en-us/windows/desktop/secauthz/privilege-constants
 	var tokenPrivilege []string
 	if len(tokenPrivilege) == 0 {
@@ -175,7 +175,7 @@ func GetTokenPrivileges(token syscall.Token) (map[string]Privilege, error) {
 		if err != nil {
 			return nil, err
 		}
-		// https://docs.microsoft.com/en-us/windows/desktop/api/winnt/ns-winnt-_privilege_set
+		// https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-_privilege_set
 		rtn[name] = Privilege{
 			LUID:             luid,
 			Name:             name,
@@ -198,8 +198,8 @@ func GetTokenPrivileges(token syscall.Token) (map[string]Privilege, error) {
 	return rtn, nil
 }
 
-// GetTokenUser returns the User associated with the given Token.
-func GetTokenUser(token syscall.Token) (User, error) {
+// GetTokenUser返回与给定Token关联的User。
+func GetTokenUser(t syscall.Token) (*User, error) {
 	tokenUser, err := token.GetTokenUser()
 	if err != nil {
 		return User{}, err
@@ -225,7 +225,7 @@ func GetTokenUser(token syscall.Token) (User, error) {
 	return user, nil
 }
 
-// adjustTokenPrivileges from core zsyscall_windows.go
+// AdjustTokenPrivileges 来自 core zsyscall_windows.go
 func AdjustTokenPrivileges(token syscall.Token, disableAllPrivileges bool, newstate *byte, buflen uint32, prevstate *byte, returnlen *uint32) (ret uint32, err error) {
 	var _p0 uint32
 	if disableAllPrivileges {

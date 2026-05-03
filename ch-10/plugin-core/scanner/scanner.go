@@ -1,11 +1,11 @@
 package scanner
 
-// Scanner defines an interface to which all checks adhere
+// Scanner定义一个所有检查都遵循的接口
 type Checker interface {
 	Check(host string, port uint64) *Result
 }
 
-// Result defines the outcome of a check
+// Result定义检查的结果
 type Result struct {
 	Vulnerable bool
 	Details    string
