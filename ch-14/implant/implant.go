@@ -35,7 +35,7 @@ func main() {
 			log.Fatal(err)
 		}
 		if cmd.In == "" {
-			// No work
+			// 无工作
 			time.Sleep(3 * time.Second)
 			continue
 		}

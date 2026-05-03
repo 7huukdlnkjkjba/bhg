@@ -8,17 +8,17 @@ service Implant {
     rpc SendOutput (Command) returns (Empty);
 }
 
-// Admin defines our Admin API functions
+// Admin定义我们的Admin API函数
 service Admin {
     rpc RunCommand (Command) returns (Command);
 }
 
-// Command defines a with both input and output fields
+// Command定义具有输入和输出字段的消息
 message Command {
     string In = 1;
     string Out = 2;
 }
 
-// Empty defines an empty message used in place of null
+// Empty定义一个用于替代null的空消息
 message Empty {
 }

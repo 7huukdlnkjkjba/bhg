@@ -42,7 +42,7 @@ func (s *implantServer) FetchCommand(ctx context.Context, empty *grpcapi.Empty) 
 		}
 		return cmd, errors.New("channel closed")
 	default:
-		// No work
+		// 无工作
 		return cmd, nil
 	}
 }
