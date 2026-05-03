@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	porterrmsg = "Invalid port specification"
+	porterrmsg = "无效的端口规范"
 )
 
 func dashSplit(sp string, ports *[]int) error {
@@ -44,7 +44,7 @@ func convertAndAddPort(p string, ports *[]int) error {
 	return nil
 }
 
-// Parse turns a string of ports separated by '-' or ',' and returns a slice of Ints.
+// Parse将用'-'或','分隔的端口字符串转换为int切片。
 func Parse(s string) ([]int, error) {
 	ports := []int{}
 	if strings.Contains(s, ",") && strings.Contains(s, "-") {

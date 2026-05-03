@@ -7,26 +7,26 @@ import (
 	"os"
 )
 
-// FooReader defines an io.Reader to read from stdin.
+// FooReader定义一个从stdin读取的io.Reader。
 type FooReader struct{}
 
-// Read reads data from stdin.
+// Read从stdin读取数据。
 func (fooReader *FooReader) Read(b []byte) (int, error) {
 	fmt.Print("in > ")
 	return os.Stdin.Read(b)
 }
 
-// FooWriter defines an io.Writer to write to Stdout.
+// FooWriter定义一个写入Stdout的io.Writer。
 type FooWriter struct{}
 
-// Write writes data to Stdout.
+// Write写入数据到Stdout。
 func (fooWriter *FooWriter) Write(b []byte) (int, error) {
 	fmt.Print("out> ")
 	return os.Stdout.Write(b)
 }
 
 func main() {
-	// Instantiate reader and writer.
+	// 实例化reader和writer。
 	var (
 		reader FooReader
 		writer FooWriter

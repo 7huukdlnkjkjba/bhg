@@ -6,42 +6,42 @@ import (
 	"os"
 )
 
-// FooReader defines an io.Reader to read from stdin.
+// FooReader定义一个从stdin读取的io.Reader。
 type FooReader struct{}
 
-// Read reads data from stdin.
+// Read从stdin读取数据。
 func (fooReader *FooReader) Read(b []byte) (int, error) {
 	fmt.Print("in > ")
 	return os.Stdin.Read(b)
 }
 
-// FooWriter defines an io.Writer to write to Stdout.
+// FooWriter定义一个写入Stdout的io.Writer。
 type FooWriter struct{}
 
-// Write writes data to Stdout.
+// Write写入数据到Stdout。
 func (fooWriter *FooWriter) Write(b []byte) (int, error) {
 	fmt.Print("out> ")
 	return os.Stdout.Write(b)
 }
 
 func main() {
-	// Instantiate reader and writer.
+	// 实例化reader和writer。
 	var (
 		reader FooReader
 		writer FooWriter
 	)
 
-	// Create buffer to hold input/output.
+	// 创建缓冲区来保存输入/输出。
 	input := make([]byte, 4096)
 
-	// Use reader to read input.
+	// 使用reader读取输入。
 	s, err := reader.Read(input)
 	if err != nil {
 		log.Fatalln("Unable to read data")
 	}
 	fmt.Printf("Read %d bytes from stdin\n", s)
 
-	// Use writer to write output.
+	// 使用writer写入输出。
 	s, err = writer.Write(input)
 	if err != nil {
 		log.Fatalln("Unable to write data")

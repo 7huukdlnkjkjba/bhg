@@ -15,10 +15,10 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
-	// Print HTTP Status
+	// 打印HTTP状态
 	fmt.Println(resp.Status)
 
-	// Read and display response body
+	// 读取并显示响应体
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Panicln(err)

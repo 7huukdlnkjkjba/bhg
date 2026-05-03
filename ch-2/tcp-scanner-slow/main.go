@@ -10,7 +10,7 @@ func main() {
 		address := fmt.Sprintf("scanme.nmap.org:%d", i)
 		conn, err := net.Dial("tcp", address)
 		if err != nil {
-			// port is closed or filtered.
+			// 端口关闭或被过滤。
 			continue
 		}
 		conn.Close()

