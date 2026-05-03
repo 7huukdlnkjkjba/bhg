@@ -166,11 +166,11 @@ func (s *AvPairSlice) UnmarshalBinary(buf []byte, meta *encoder.Metadata) error 
 	slice := []AvPair{}
 	l, ok := meta.Lens[meta.CurrField]
 	if !ok {
-		return errors.New(fmt.Sprintf("Cannot unmarshal field '%s'. Missing length\n", meta.CurrField))
+		return errors.New(fmt.Sprintf("无法解组字段 '%s'。缺少长度\n", meta.CurrField))
 	}
 	o, ok := meta.Offsets[meta.CurrField]
 	if !ok {
-		return errors.New(fmt.Sprintf("Cannot unmarshal field '%s'. Missing offset\n", meta.CurrField))
+		return errors.New(fmt.Sprintf("无法解组字段 '%s'。缺少偏移量\n", meta.CurrField))
 	}
 	for i := l; i > 0; {
 		var avPair AvPair
@@ -242,21 +242,21 @@ func NewChallenge() Challenge {
 }
 
 func NewAuthenticatePass(domain, user, workstation, password string, c Challenge) Authenticate {
-	// Assumes domain, user, and workstation are not unicode
+	// 假设domain, user, and workstation不是unicode编码
 	nthash := Ntowfv2(password, user, domain)
 	lmhash := Lmowfv2(password, user, domain)
 	return newAuthenticate(domain, user, workstation, nthash, lmhash, c)
 }
 
 func NewAuthenticateHash(domain, user, workstation, hash string, c Challenge) Authenticate {
-	// Assumes domain, user, and workstation are not unicode
+	// 假设domain, user, and workstation不是unicode编码
 	buf := make([]byte, len(hash)/2)
 	hex.Decode(buf, []byte(hash))
 	return newAuthenticate(domain, user, workstation, buf, buf, c)
 }
 
 func newAuthenticate(domain, user, workstation string, nthash, lmhash []byte, c Challenge) Authenticate {
-	// Assumes domain, user, and workstation are not unicode
+	// 假设domain, user, and workstation不是unicode编码
 	var timestamp []byte
 	for k, av := range *c.TargetInfo {
 		if av.AvID == MsvAvTimestamp {
@@ -264,9 +264,8 @@ func newAuthenticate(domain, user, workstation string, nthash, lmhash []byte, c 
 		}
 	}
 	if timestamp == nil {
-		// Credit to https://github.com/Azure/go-ntlmssp/blob/master/unicode.go for logic
 		ft := uint64(time.Now().UnixNano()) / 100
-		ft += 116444736000000000 // add time between unix & windows offset
+		ft += 116444736000000000
 		timestamp = make([]byte, 8)
 		binary.LittleEndian.PutUint64(timestamp, ft)
 	}

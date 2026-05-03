@@ -293,7 +293,7 @@ func (s *Session) NewSessionSetup1Req() (SessionSetup1Req, error) {
 		return SessionSetup1Req{}, errors.New("Bad session ID for session setup 1 message")
 	}
 
-	// Initial session setup request
+	// 初始会话设置请求
 	init, err := gss.NewNegTokenInit()
 	if err != nil {
 		return SessionSetup1Req{}, err
@@ -343,7 +343,7 @@ func (s *Session) NewSessionSetup2Req() (SessionSetup2Req, error) {
 		return SessionSetup2Req{}, errors.New("Bad session ID for session setup 2 message")
 	}
 
-	// Session setup request #2
+	// 会话设置请求 #2
 	resp, err := gss.NewNegTokenResp()
 	if err != nil {
 		return SessionSetup2Req{}, err
@@ -376,8 +376,7 @@ func NewSessionSetup2Res() (SessionSetup2Res, error) {
 	return ret, nil
 }
 
-// NewTreeConnectReq creates a new TreeConnect message and accepts the share name
-// as input.
+// NewTreeConnectReq创建一个新的TreeConnect消息并接受共享名称作为输入。
 func (s *Session) NewTreeConnectReq(name string) (TreeConnectReq, error) {
 	header := newHeader()
 	header.Command = CommandTreeConnect

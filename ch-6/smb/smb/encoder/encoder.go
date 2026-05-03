@@ -91,13 +91,11 @@ func parseTags(sf reflect.StructField) (*TagMap, error) {
 
 func getOffsetByFieldName(fieldName string, meta *Metadata) (uint64, error) {
 	if meta == nil || meta.Tags == nil || meta.Parent == nil || meta.Lens == nil {
-		return 0, errors.New("Cannot determine field offset. Missing required metadata")
+		return 0, errors.New("无法确定字段偏移量。缺少必需的元数据")
 	}
 	var ret uint64
 	var found bool
 	parentvf := reflect.Indirect(reflect.ValueOf(meta.Parent))
-	// To determine offset, we loop through all fields of the struct, summing lengths of previous elements
-	// until we reach our field
 	for i := 0; i < parentvf.NumField(); i++ {
 		tf := parentvf.Type().Field(i)
 		if tf.Name == fieldName {
@@ -105,10 +103,8 @@ func getOffsetByFieldName(fieldName string, meta *Metadata) (uint64, error) {
 			break
 		}
 		if l, ok := meta.Lens[tf.Name]; ok {
-			// Length of field is in cache
 			ret += l
 		} else {
-			// Not in cache. Must marshal field to determine length. Add to cache after
 			buf, err := Marshal(parentvf.Field(i).Interface())
 			if err != nil {
 				return 0, err
@@ -127,10 +123,9 @@ func getOffsetByFieldName(fieldName string, meta *Metadata) (uint64, error) {
 func getFieldLengthByName(fieldName string, meta *Metadata) (uint64, error) {
 	var ret uint64
 	if meta == nil || meta.Tags == nil || meta.Parent == nil || meta.Lens == nil {
-		return 0, errors.New("Cannot determine field length. Missing required metadata")
+		return 0, errors.New("无法确定字段长度。缺少必需的元数据")
 	}
 
-	// Check if length is stored in field length cache
 	if val, ok := meta.Lens[fieldName]; ok {
 		return uint64(val), nil
 	}
@@ -139,12 +134,11 @@ func getFieldLengthByName(fieldName string, meta *Metadata) (uint64, error) {
 
 	field := parentvf.FieldByName(fieldName)
 	if !field.IsValid() {
-		return 0, errors.New("Invalid field. Cannot determine length.")
+		return 0, errors.New("无效字段。无法确定长度。")
 	}
 
 	bm, ok := field.Interface().(BinaryMarshallable)
 	if ok {
-		// Custom marshallable interface found.
 		buf, err := bm.(BinaryMarshallable).MarshalBinary(meta)
 		if err != nil {
 			return 0, err
@@ -164,13 +158,13 @@ func getFieldLengthByName(fieldName string, meta *Metadata) (uint64, error) {
 		}
 		ret = uint64(len(buf))
 	case reflect.Interface:
-		return 0, errors.New("Interface length calculation not implemented")
+		return 0, errors.New("接口长度计算未实现")
 	case reflect.Slice, reflect.Array:
 		switch field.Type().Elem().Kind() {
 		case reflect.Uint8:
 			ret = uint64(len(field.Interface().([]byte)))
 		default:
-			return 0, errors.New("Cannot calculate the length of unknown slice type for " + fieldName)
+			return 0, errors.New("无法计算未知切片类型的长度 for " + fieldName)
 		}
 	case reflect.Uint8:
 		ret = uint64(binary.Size(field.Interface().(uint8)))
@@ -181,7 +175,7 @@ func getFieldLengthByName(fieldName string, meta *Metadata) (uint64, error) {
 	case reflect.Uint64:
 		ret = uint64(binary.Size(field.Interface().(uint64)))
 	default:
-		return 0, errors.New("Cannot calculate the length of unknown kind for field " + fieldName)
+		return 0, errors.New("无法计算未知类型的字段长度 " + fieldName)
 	}
 	meta.Lens[fieldName] = ret
 	return ret, nil
@@ -198,7 +192,6 @@ func marshal(v interface{}, meta *Metadata) ([]byte, error) {
 
 	bm, ok := v.(BinaryMarshallable)
 	if ok {
-		// Custom marshallable interface found.
 		buf, err := bm.MarshalBinary(meta)
 		if err != nil {
 			return nil, err
@@ -319,7 +312,6 @@ func unmarshal(buf []byte, v interface{}, meta *Metadata) (interface{}, error) {
 
 	bm, ok := v.(BinaryMarshallable)
 	if ok {
-		// Custom marshallable interface found.
 		if err := bm.UnmarshalBinary(buf, meta); err != nil {
 			return nil, err
 		}
@@ -426,7 +418,6 @@ func unmarshal(buf []byte, v interface{}, meta *Metadata) (interface{}, error) {
 				if length, err = meta.Tags.GetInt("fixed"); err != nil {
 					return nil, err
 				}
-				// Fixed length fields advance current offset
 				meta.CurrOffset += uint64(length)
 			} else {
 				if val, ok := meta.Lens[meta.CurrField]; ok {
@@ -437,12 +428,9 @@ func unmarshal(buf []byte, v interface{}, meta *Metadata) (interface{}, error) {
 				if val, ok := meta.Offsets[meta.CurrField]; ok {
 					offset = int(val)
 				} else {
-					// No offset found in map. Use current offset
 					offset = int(meta.CurrOffset)
 				}
-				// Variable length data is relative to parent/outer struct. Reset reader to point to beginning of data
 				r = bytes.NewBuffer(meta.ParentBuf[offset : offset+length])
-				// Variable length data fields do NOT advance current offset.
 			}
 			data := make([]byte, length)
 			if err := binary.Read(r, binary.LittleEndian, &data); err != nil {
@@ -457,7 +445,6 @@ func unmarshal(buf []byte, v interface{}, meta *Metadata) (interface{}, error) {
 	}
 
 	return nil, nil
-
 }
 
 func Unmarshal(buf []byte, v interface{}) error {

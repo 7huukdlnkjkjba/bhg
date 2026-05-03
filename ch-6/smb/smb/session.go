@@ -43,10 +43,10 @@ type Options struct {
 
 func validateOptions(opt Options) error {
 	if opt.Host == "" {
-		return errors.New("Missing required option: Host")
+		return errors.New("缺少必需的选项: Host")
 	}
 	if opt.Port < 1 || opt.Port > 65535 {
-		return errors.New("Invalid or missing value: Port")
+		return errors.New("无效或缺少的值: Port")
 	}
 	return nil
 }
@@ -113,7 +113,7 @@ func (s *Session) NegotiateProtocol() error {
 		return errors.New(fmt.Sprintf("NT Status Error: %d\n", negRes.Header.Status))
 	}
 
-	// Check SPNEGO security blob
+	// 检查SPNEGO安全blob
 	spnegoOID, err := gss.ObjectIDStrToInt(gss.SpnegoOid)
 	if err != nil {
 		return err
@@ -126,7 +126,7 @@ func (s *Session) NegotiateProtocol() error {
 			negRes.SecurityBlob.OID))
 	}
 
-	// Check for NTLMSSP support
+	// 检查NTLMSSP支持
 	ntlmsspOID, err := gss.ObjectIDStrToInt(gss.NtLmSSPMechTypeOid)
 	if err != nil {
 		s.Debug("", err)
@@ -141,13 +141,13 @@ func (s *Session) NegotiateProtocol() error {
 		}
 	}
 	if !hasNTLMSSP {
-		return errors.New("Server does not support NTLMSSP")
+		return errors.New("服务器不支持NTLMSSP")
 	}
 
 	s.securityMode = negRes.SecurityMode
 	s.dialect = negRes.DialectRevision
 
-	// Determine whether signing is required
+	// 确定是否需要签名
 	mode := uint16(s.securityMode)
 	if mode&SecurityModeSigningEnabled > 0 {
 		if mode&SecurityModeSigningRequired > 0 {
@@ -210,11 +210,11 @@ func (s *Session) NegotiateProtocol() error {
 
 	var auth ntlmssp.Authenticate
 	if s.options.Hash != "" {
-		// Hash present, use it for auth
+		// 存在哈希,使用它进行认证
 		s.Debug("Performing hash-based authentication", nil)
 		auth = ntlmssp.NewAuthenticateHash(s.options.Domain, s.options.User, s.options.Workstation, s.options.Hash, challenge)
 	} else {
-		// No hash, use password
+		// 没有哈希,使用密码
 		s.Debug("Performing password-based authentication", nil)
 		auth = ntlmssp.NewAuthenticatePass(s.options.Domain, s.options.User, s.options.Workstation, s.options.Password, challenge)
 	}

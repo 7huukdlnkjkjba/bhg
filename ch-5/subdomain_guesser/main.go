@@ -51,21 +51,21 @@ func lookupCNAME(fqdn, serverAddr string) ([]string, error) {
 
 func lookup(fqdn, serverAddr string) []result {
 	var results []result
-	var cfqdn = fqdn // Don't modify the original.
+	var cfqdn = fqdn // 不要修改原始值。
 	for {
 		cnames, err := lookupCNAME(cfqdn, serverAddr)
 		if err == nil && len(cnames) > 0 {
 			cfqdn = cnames[0]
-			continue // We have to process the next CNAME.
+			continue // 我们需要处理下一个CNAME。
 		}
 		ips, err := lookupA(cfqdn, serverAddr)
 		if err != nil {
-			break // There are no A records for this hostname.
+			break // 此主机名没有A记录。
 		}
 		for _, ip := range ips {
 			results = append(results, result{IPAddress: ip, Hostname: fqdn})
 		}
-		break // We have processed all the results.
+		break // 我们已处理完所有结果。
 	}
 	return results
 }
@@ -89,12 +89,10 @@ type result struct {
 }
 
 func main() {
-	var (
-		flDomain      = flag.String("domain", "", "The domain to perform guessing against.")
-		flWordlist    = flag.String("wordlist", "", "The wordlist to use for guessing.")
-		flWorkerCount = flag.Int("c", 100, "The amount of workers to use.")
-		flServerAddr  = flag.String("server", "8.8.8.8:53", "The DNS server to use.")
-	)
+	flag.StringVar(&flDomain, "domain", "", "要执行猜测的域名。")
+	flag.StringVar(&flWordlist, "wordlist", "", "要使用的词表。")
+	flag.IntVar(&flWorkerCount, "c", 100, "要使用的worker数量。")
+	flag.StringVar(&flServerAddr, "server", "8.8.8.8:53", "要使用的DNS服务器。")
 	flag.Parse()
 
 	if *flDomain == "" || *flWordlist == "" {
@@ -130,8 +128,7 @@ func main() {
 	for scanner.Scan() {
 		fqdns <- fmt.Sprintf("%s.%s", scanner.Text(), *flDomain)
 	}
-	// Note: We could check scanner.Err() here.
-
+	// 注意:我们可以在此处检查scanner.Err()。
 	close(fqdns)
 	for i := 0; i < *flWorkerCount; i++ {
 		<-tracker

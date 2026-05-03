@@ -34,9 +34,9 @@ type NegTokenResp struct {
 	MechListMIC   []byte                `asn1:"explicit,optional,omitempty,tag:3"`
 }
 
-// gsswrapped used to force ASN1 encoding to include explicit sequence tags
-// Type does not fulfill the BinaryMarshallable interfce and is used only as a
-// helper to marshal a NegTokenResp
+// gsswrapped用于强制ASN1编码包含显式序列标记
+// 该类型不满足BinaryMarshallable接口,仅作为辅助函数用于
+// 序列化NegTokenResp
 type gsswrapped struct{ G interface{} }
 
 func NewNegTokenInit() (NegTokenInit, error) {
@@ -70,8 +70,8 @@ func (n *NegTokenInit) MarshalBinary(meta *encoder.Metadata) ([]byte, error) {
 		return nil, err
 	}
 
-	// When marshalling struct, asn1 uses 30 (sequence) tag by default.
-	// Override to set 60 (application) to remain consistent with GSS/SMB
+	// 当marshal结构体时,asn1默认使用30(序列)标记。
+	// 需要将其覆盖为60(应用程序)以保持与GSS/SMB一致
 	buf[0] = 0x60
 	return buf, nil
 }
@@ -86,9 +86,8 @@ func (n *NegTokenInit) UnmarshalBinary(buf []byte, meta *encoder.Metadata) error
 }
 
 func (r *NegTokenResp) MarshalBinary(meta *encoder.Metadata) ([]byte, error) {
-	// Oddities in Go's ASN1 package vs SMB encoding mean we have to wrap our
-	// struct in another struct to ensure proper tags and lengths are added
-	// to encoded data
+	// Go的ASN1包与SMB编码的差异意味着我们必须将结构体包装在另一个结构体中,
+	// 以确保在编码数据中添加正确的标签和长度
 	wrapped := &gsswrapped{*r}
 	return wrapped.MarshalBinary(meta)
 }

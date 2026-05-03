@@ -8,9 +8,9 @@ import (
 )
 
 func FromUnicode(d []byte) (string, error) {
-	// Credit to https://github.com/Azure/go-ntlmssp/blob/master/unicode.go for logic
+	// 参考 https://github.com/Azure/go-ntlmssp/blob/master/unicode.go 的逻辑
 	if len(d)%2 > 0 {
-		return "", errors.New("Unicode (UTF 16 LE) specified, but uneven data length")
+		return "", errors.New("指定了Unicode (UTF 16 LE),但数据长度不一致")
 	}
 	s := make([]uint16, len(d)/2)
 	err := binary.Read(bytes.NewReader(d), binary.LittleEndian, &s)
@@ -21,7 +21,7 @@ func FromUnicode(d []byte) (string, error) {
 }
 
 func ToUnicode(s string) []byte {
-	// Credit to https://github.com/Azure/go-ntlmssp/blob/master/unicode.go for logic
+	// 参考 https://github.com/Azure/go-ntlmssp/blob/master/unicode.go 的逻辑
 	uints := utf16.Encode([]rune(s))
 	b := bytes.Buffer{}
 	binary.Write(&b, binary.LittleEndian, &uints)
